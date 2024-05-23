@@ -20,9 +20,9 @@ spec:
     spec:
       containers:
       - name: hello-world
-        image: nginxdemos/hello
+        image: nginx
         ports:
-        - containerPort: 8080
+        - containerPort: 80
 EOF
 )
 
@@ -37,11 +37,10 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8080
+      targetPort: 80
   type: LoadBalancer
 EOF
 )
-
 
 # Apply the deployment YAML
 echo "Creating Hello World Deployment..."
@@ -51,17 +50,17 @@ echo "$DEPLOYMENT_YAML" | kubectl apply -f -
 echo "Creating Hello World Service..."
 echo "$SERVICE_YAML" | kubectl apply -f -
 
-# Wait for the LoadBalancer IP to be provisioned
-echo "Waiting for LoadBalancer IP to be provisioned..."
+# Wait for the LoadBalancer hostname to be provisioned
+echo "Waiting for LoadBalancer hostname to be provisioned..."
 while true; do
-  EXTERNAL_IP=$(kubectl get svc hello-world -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-  if [ -n "$EXTERNAL_IP" ]; then
+  EXTERNAL_HOSTNAME=$(kubectl get svc hello-world -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+  if [ -n "$EXTERNAL_HOSTNAME" ]; then
     break
   fi
-  echo "Still waiting for LoadBalancer IP..."
+  echo "Still waiting for LoadBalancer hostname..."
   sleep 10
 done
 
-# Display the external IP address
+# Display the external hostname
 echo "Hello World application is deployed."
-echo "Access it at http://$EXTERNAL_IP"
+echo "Access it at http://$EXTERNAL_HOSTNAME"
